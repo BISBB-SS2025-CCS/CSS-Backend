@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database Service
+  db:
+    image: postgres:13 # Using a specific version for stability
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: your_db_name       # <--- IMPORTANT: Match this to your server.js
+      POSTGRES_USER: your_db_user     # <--- IMPORTANT: Match this to your server.js
+      POSTGRES_PASSWORD: your_db_password # <--- IMPORTANT: Match this to your server.js
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Persistent data volume
+    ports:
+      - "5432:5432" # Expose PostgreSQL port (optional, for direct access)
+
+  # Redis Cache Service
+  redis:
+    image: redis:6-alpine # Using a lightweight Redis image
+    container_name: redis_cache
+    restart: always
+    volumes:
+      - redisdata:/data # Persistent data volume for Redis
+    ports:
+      - "6379:6379" # Expose Redis port (optional, for direct access)
+
+  # Node.js Application Service
+  app:
+    build: . # Build from the Dockerfile in the current directory
+    container_name: node_api_app
+    restart: always
+    # Mount the current directory into the container for live development
+    # Changes to your server.js will require restarting the 'app' service
+    volumes:
+      - .:/app
+      - /app/node_modules # Exclude node_modules from host bind mount to prevent issues
+    ports:
+      - "3000:3000" # Expose the Node.js app port
+    environment:
+      # These environment variables are not directly used in your server.js right now
+      # but are good practice for externalizing configuration.
+      # Your server.js currently hardcodes DB connection details.
+      # For a production setup, you would pass these to your Node.js app
+      # and read them using process.env.
+      DATABASE_URL: postgres://your_db_user:your_db_password@db:5432/your_db_name
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      - db # Ensures 'db' service starts before 'app'
+      - redis # Ensures 'redis' service starts before 'app'
+
+# Docker Volumes for persistent data
+volumes:
+  pgdata:
+  redisdata:
