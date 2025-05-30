@@ -8,14 +8,27 @@ const jwt = require('jsonwebtoken'); // Import jsonwebtoken
 const app = express();
 const port = 3000;
 
+// Add CORS headers middleware
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.type('application/json');
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
+
 app.use(bodyParser.json());
 
 // --- Configuration ---
 const dbConfig = {
-  user: process.env.POSTGRES_USER || 'your_db_user',
+  user: process.env.POSTGRES_USER || 'dani',
   host: process.env.POSTGRES_HOST || 'localhost',
-  database: process.env.POSTGRES_DB || 'your_db_name',
-  password: process.env.POSTGRES_PASSWORD || 'your_db_password',
+  database: process.env.POSTGRES_DB || 'incidentDb',
+  password: process.env.POSTGRES_PASSWORD || 'dani1234',
   port: process.env.POSTGRES_PORT || 5432,
 };
 
@@ -60,7 +73,7 @@ const generateToken = (userId, username) => {
 };
 
 // Route for user registration
-app.post('/register', async (req, res) => {
+app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password are required.' });
@@ -82,7 +95,7 @@ app.post('/register', async (req, res) => {
 });
 
 // Route for user login
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password are required.' });
@@ -123,7 +136,7 @@ const authenticateToken = (req, res, next) => {
 // --- CRUD Operations for Incidents with Caching and Token Authentication ---
 
 // GET all incidents (requires token authentication)
-app.get('/incidents', authenticateToken, async (req, res) => {
+app.get('/api/incidents', authenticateToken, async (req, res) => {
   const cacheKey = 'all_incidents';
   try {
     const cachedIncidents = await redisClient.get(cacheKey);
@@ -146,7 +159,7 @@ app.get('/incidents', authenticateToken, async (req, res) => {
 });
 
 // GET a single incident by ID (requires token authentication)
-app.get('/incidents/:id', authenticateToken, async (req, res) => {
+app.get('/api/incidents/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const cacheKey = `incident:${id}`;
   try {
@@ -172,7 +185,7 @@ app.get('/incidents/:id', authenticateToken, async (req, res) => {
 });
 
 // POST a new incident (requires token authentication)
-app.post('/incidents', authenticateToken, async (req, res) => {
+app.post('/api/incidents', authenticateToken, async (req, res) => {
   const { title, reporter, type, description, resource_id } = req.body;
   if (!title) {
     return res.status(400).json({ error: 'Title is required.' });
@@ -195,7 +208,7 @@ app.post('/incidents', authenticateToken, async (req, res) => {
 });
 
 // PUT (update) an existing incident (requires token authentication)
-app.put('/incidents/:id', authenticateToken, async (req, res) => {
+app.put('/api/incidents/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { title, reporter, type, description, resource_id } = req.body;
   try {
@@ -220,8 +233,9 @@ app.put('/incidents/:id', authenticateToken, async (req, res) => {
 });
 
 // DELETE an incident (requires token authentication)
-app.delete('/incidents/:id', authenticateToken, async (req, res) => {
+app.delete('/api/incidents/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
+  console.log(req.url);
   try {
     const result = await query('DELETE FROM incidents WHERE id = $1 RETURNING id', [id]);
     if (result.rowCount > 0) {

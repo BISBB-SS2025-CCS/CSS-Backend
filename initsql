@@ -1,0 +1,19 @@
+-- Tabelle für Incidents
+CREATE TABLE incidents (
+    id SERIAL PRIMARY KEY,
+    date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    title VARCHAR(255) NOT NULL,
+    reporter VARCHAR(100),
+    type VARCHAR(50),
+    description TEXT,
+    resource_id VARCHAR(100),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabelle für Benutzer (einfache Authentifizierung)
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL -- Hashed Passwörter speichern!
+);
