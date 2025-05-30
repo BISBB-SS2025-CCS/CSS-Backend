@@ -24,20 +24,36 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 
 // --- Configuration ---
-const dbConfig = {
-  user: process.env.POSTGRES_USER || 'dani',
-  host: process.env.POSTGRES_HOST || 'localhost',
-  database: process.env.POSTGRES_DB || 'incidentDb',
-  password: process.env.POSTGRES_PASSWORD || 'dani1234',
-  port: process.env.POSTGRES_PORT || 5432,
-};
+let dbConfig;
+if (process.env.DATABASE_URL) {
+  dbConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false // Required for some cloud providers like Heroku
+    }
+  };
+} else {
+  dbConfig = {
+    user: process.env.POSTGRES_USER || 'dani',
+    host: process.env.POSTGRES_HOST || 'localhost',
+    database: process.env.POSTGRES_DB || 'incidentDb',
+    password: process.env.POSTGRES_PASSWORD || 'dani1234',
+    port: process.env.POSTGRES_PORT || 5432,
+  };
+}
 
-const redisConfig = {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: process.env.REDIS_PORT || 6379,
-};
+let redisClient;
+if (process.env.APP_REDIS_CONNECTION_STRING) {
+  redisClient = new Redis(process.env.APP_REDIS_CONNECTION_STRING);
+} else {
+  const redisConfig = {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: process.env.REDIS_PORT || 6379,
+  };
+  redisClient = new Redis(redisConfig);
+}
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // Replace with a strong, secret key
+const JWT_SECRET = process.env.SESSION_SECRET || 'your-secret-key'; // Replace with a strong, secret key
 
 // PostgreSQL connection pool
 const pool = new Pool(dbConfig);
@@ -53,7 +69,7 @@ const query = async (text, params) => {
 };
 
 // Redis client
-const redisClient = new Redis(redisConfig);
+// const redisClient = new Redis(redisConfig); // This line is now replaced by the conditional logic above
 
 redisClient.on('error', (err) => {
   console.error('Redis Client Error:', err);
