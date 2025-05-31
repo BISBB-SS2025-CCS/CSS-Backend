@@ -58,6 +58,23 @@ const JWT_SECRET = process.env.SESSION_SECRET || 'your-secret-key'; // Replace w
 // PostgreSQL connection pool
 const pool = new Pool(dbConfig);
 
+// Test PostgreSQL connection
+(async () => {
+  let client;
+  try {
+    client = await pool.connect();
+    console.log('Successfully connected to PostgreSQL database!');
+  } catch (err) {
+    console.error('Failed to connect to PostgreSQL database:', err);
+    // Optionally, you might want to exit the process if the DB connection fails at startup
+    // process.exit(1);
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+})();
+
 // Helper function to execute database queries
 const query = async (text, params) => {
   const client = await pool.connect();
@@ -72,6 +89,8 @@ const query = async (text, params) => {
 // const redisClient = new Redis(redisConfig); // This line is now replaced by the conditional logic above
 
 redisClient.on('error', (err) => {
+  console.log("" + redisConfig.host + ":" + redisConfig.port);  
+  console.log();  
   console.error('Redis Client Error:', err);
 });
 
