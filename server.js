@@ -89,9 +89,8 @@ const query = async (text, params) => {
 // const redisClient = new Redis(redisConfig); // This line is now replaced by the conditional logic above
 
 redisClient.on('error', (err) => {
-  console.log("" + redisConfig.host + ":" + redisConfig.port);  
-  console.log();  
-  console.error('TEST TEST TEST Redis Client Error:', err);
+  
+  console.error('TEST TEST TEST Redis Client Error:' + redisClient, err);
 });
 
 redisClient.on('connect', () => {
