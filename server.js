@@ -91,7 +91,7 @@ const query = async (text, params) => {
 redisClient.on('error', (err) => {
   console.log("" + redisConfig.host + ":" + redisConfig.port);  
   console.log();  
-  console.error('Redis Client Error:', err);
+  console.error('TEST TEST TEST Redis Client Error:', err);
 });
 
 redisClient.on('connect', () => {
