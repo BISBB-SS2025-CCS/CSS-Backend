@@ -40,6 +40,7 @@ if (process.env.DATABASE_URL) {
     password: process.env.POSTGRES_PASSWORD || 'dani1234',
     port: process.env.POSTGRES_PORT || 5432,
   };
+  console.log('DEBUG ENV:', process.env);
 }
 
 let redisClient;
