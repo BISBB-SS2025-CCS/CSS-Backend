@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 const Redis = require('ioredis');
-const jwt = require('jsonwebtoken'); // Import jsonwebtoken
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const port = 3000;
