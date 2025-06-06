@@ -295,5 +295,5 @@ app.delete('/api/incidents/:id', authenticateToken, async (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
-  console.log(`DEBUG ENV:', ${process.env}`);
+  console.log('DEBUG ENV:', Object.entries(process.env));
 });
