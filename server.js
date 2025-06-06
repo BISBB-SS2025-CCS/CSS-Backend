@@ -108,6 +108,7 @@ const generateToken = (userId, username) => {
 
 // Route for user registration
 app.post('/api/register', async (req, res) => {
+  console.log("Requested registration:", req.ip);
   const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password are required.' });
@@ -130,6 +131,7 @@ app.post('/api/register', async (req, res) => {
 
 // Route for user login
 app.post('/api/login', async (req, res) => {
+  console.log("Requested login:", req.ip);
   const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password are required.' });
@@ -171,6 +173,7 @@ const authenticateToken = (req, res, next) => {
 
 // GET all incidents (requires token authentication)
 app.get('/api/incidents', authenticateToken, async (req, res) => {
+  console.log("Requested incidents:", req.ip);
   const cacheKey = 'all_incidents';
   try {
     const cachedIncidents = await redisClient.get(cacheKey);
@@ -194,6 +197,7 @@ app.get('/api/incidents', authenticateToken, async (req, res) => {
 
 // GET a single incident by ID (requires token authentication)
 app.get('/api/incidents/:id', authenticateToken, async (req, res) => {
+  console.log("Requested incident with id:", req.ip);
   const { id } = req.params;
   const cacheKey = `incident:${id}`;
   try {
@@ -220,6 +224,7 @@ app.get('/api/incidents/:id', authenticateToken, async (req, res) => {
 
 // POST a new incident (requires token authentication)
 app.post('/api/incidents', authenticateToken, async (req, res) => {
+  console.log("Requested incident creation:", req.ip);
   const { title, reporter, type, description, resource_id } = req.body;
   if (!title) {
     return res.status(400).json({ error: 'Title is required.' });
@@ -243,6 +248,7 @@ app.post('/api/incidents', authenticateToken, async (req, res) => {
 
 // PUT (update) an existing incident (requires token authentication)
 app.put('/api/incidents/:id', authenticateToken, async (req, res) => {
+  console.log("Requested incident update:", req.ip);
   const { id } = req.params;
   const { title, reporter, type, description, resource_id } = req.body;
   try {
@@ -268,6 +274,7 @@ app.put('/api/incidents/:id', authenticateToken, async (req, res) => {
 
 // DELETE an incident (requires token authentication)
 app.delete('/api/incidents/:id', authenticateToken, async (req, res) => {
+  console.log("Requested incident deletion:", req.ip);
   const { id } = req.params;
   console.log(req.url);
   try {
