@@ -302,30 +302,11 @@ app.listen(port, () => {
 
 
 
-app.get('/api/escalate/:id', authenticateToken, async (req, res) => {
-  console.log("Requested escalate incident with id:", req.ip);
+app.post('/api/escalate/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
-  console.log(`Escalating incident with ID: ${id}`);
-  // const cacheKey = `incident:${id}`;
-  // try {
-  //   const cachedIncident = await redisClient.get(cacheKey);
-  //   if (cachedIncident) {
-  //     console.log(`Serving incident ${id} from Redis cache`);
-  //     return res.json(JSON.parse(cachedIncident));
-  //   }
-
-  //   console.log(`Fetching incident ${id} from PostgreSQL`);
-  //   const result = await query('SELECT * FROM incidents WHERE id = $1', [id]);
-  //   if (result.rows.length > 0) {
-  //     const incident = result.rows[0];
-  //     await redisClient.setex(cacheKey, CACHE_EXPIRATION_SECONDS, JSON.stringify(incident));
-      
-  //     res.json(incident);
-  //   } else {
-  //     res.status(404).json({ message: 'Incident not found.' });
-  //   }
-  // } catch (error) {
-  //   console.error(`Error fetching incident with ID ${id} (with caching):`, error);
-  //   res.status(500).json({ error: 'Internal server error.' });
-  // }
+  console.log("Requested incident escalation:", req.ip);
+  // const { title, reporter, type, description, resource_id } = req.body;
+  console.log(`request body: ${JSON.stringify(req.body)}`);
+  console.log(`incident id: ${id}`);
+  
 });
