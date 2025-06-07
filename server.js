@@ -308,5 +308,15 @@ app.post('/api/escalate/:id', authenticateToken, async (req, res) => {
   // const { title, reporter, type, description, resource_id } = req.body;
   console.log(`request body: ${JSON.stringify(req.body)}`);
   console.log(`incident id: ${id}`);
+  const serverLessResponse = await fetch(`${TELEBOT_URL}?resourceId=${id}`);
+  console.log(`Serverless response: ${serverLessResponse.status} ${serverLessResponse.statusText}`);
   
+  if( !serverLessResponse.ok) {
+    console.error('Failed to escalate incident:', serverLessResponse.statusText);
+    return res.status(500).json({ error: 'Failed to escalate incident.' });
+  } else {
+    const responseData = await serverLessResponse.json();
+    console.log('Serverless response data:', responseData);
+    return res.status(200).json(responseData);
+  }
 });
